@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700&display=swap');
+
+:root {
+    --green: #16a085;
+    --black: #444;
+    --light-color: #777;
+    --box-shadow: .3rem .3rem 0 rgba(22, 160, 133, .2);
+    --border: .15rem solid var(--green);
+    --background: rgba(255, 255, 255, 0.8);
+    --button-hover: #13856e;
+}
+
+* {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    outline: none;
+    border: none;
+    text-transform: capitalize;
+    transition: all .2s ease-out;
+    text-decoration: none;
+}
+
+body {
+    background-image: url('images/19366.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.mainTabs {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+}
+
+.tabs {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--green);
+    justify-content: center;
+    align-items: center;
+    padding: 3px 4px;
+    border-radius: 30px;
+    margin-bottom: 1rem;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 8px 16px;
+    border: var(--border);
+    background: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    border-radius: 15px;
+    transition: all 0.2s ease;
+    color: var(--green);
+    margin: 2px;
+    background-color: #fff;
+    font-family: 'Poppins', sans-serif;
+}
+
+.tab_label {
+    font-size: 1.8rem;
+    color: var(--black);
+}
+
+.tab-button:hover {
+    background-color: var(--green);
+    color: #fff;
+}
+
+.tab-button.active {
+    background: var(--green);
+    font-weight: 500;
+    color: #fff;
+}
+
+.tab-content {
+    display: none;
+    padding: 1rem;
+    border-radius: 6px;
+    background: var(--background);
+    box-shadow: var(--box-shadow);
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+input {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+    resize: none;
+    margin-top: 1rem;
+    background-color: var(--black);
+    color: #fff;
+    box-shadow: var(--box-shadow);
+    border: var(--border);
+    text-align: center;
+}
+
+input:focus {
+    border: 2px solid var(--green);
+    outline: none;
+}
+
+/* Default full-width buttons */
+button {
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    background: var(--green);
+    color: white;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+}
+
+button:hover {
+    background: var(--button-hover);
+}
+
+/* Smaller buttons for search actions */
+button.search-btn {
+    width: auto !important;
+    padding: 6px 16px; /* Reduced padding for smaller buttons */
+    font-size: 0.85rem; /* Reduced font size */
+    font-weight: 500;
+    margin: 10px auto; /* Adjusted margin for better spacing */
+    display: inline-block;
+    background: var(--green);
+    color: white;
+    border-radius: 8px;
+    box-shadow: var(--box-shadow);
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+}
+
+button.search-btn:hover {
+    background: var(--button-hover);
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+}
+
+ul li {
+    background: #f0f0f0;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: var(--black);
+    font-weight: 500;
+}

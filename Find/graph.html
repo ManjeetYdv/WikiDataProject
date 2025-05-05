@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Medicine Composition Graph</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style>
+        #network {
+            width: 100%;
+            height: 600px;
+            background-color: white;
+            border: 1px solid lightgray;
+            margin-top: 40px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--black);
+        }
+
+        .back-button {
+            display: block;
+            width: 200px;
+            margin: 2rem auto;
+            padding: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: center;
+            background-color: var(--green);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background-color: var(--button-hover);
+        }
+    </style>
+</head>
+<body>
+    <h2>Medicine Composition Visualization</h2>
+    <div id="network"></div>
+    <button class="back-button" onclick="window.history.back()">← Back</button>
+
+    <script>
+        const medicineIngredients = {
+  "Paracetamol": ["N-(4-hydroxyphenyl)acetamide", "Acetanilide", "Para-aminophenol"],
+  "Amoxicillin": ["Amoxicillin trihydrate", "Penicillin nucleus", "Aminopenicillin"],
+  "Aspirin": ["Acetylsalicylic acid", "Salicylic acid", "Acetic anhydride"],
+  "Ibuprofen": ["Isobutylphenylpropionic acid", "Propionic acid", "Carboxylic group"],
+  "Metformin": ["Metformin hydrochloride", "Biguanide", "Dimethylamine"],
+  "Atorvastatin": ["Atorvastatin calcium", "Pyrrole ring", "Fluorophenyl group"],
+  "Clopidogrel": ["Clopidogrel bisulfate", "Thienopyridine", "Carboxylic acid ester"],
+  "Ranitidine": ["Ranitidine hydrochloride", "Furan ring", "Nitroethene"],
+  "Montelukast": ["Montelukast sodium", "Quinoline", "Sodium salt"],
+  "Rac-salbutamol": ["Salbutamol sulfate", "Phenylethanolamine", "Tert-butyl group"],
+  "Cetirizine": ["Cetirizine dihydrochloride", "Piperazine", "Carboxylic acid"],
+  "Fluconazole": ["Fluconazole base", "Triazole ring", "Difluorophenyl group"],
+  "Amoxicillin (alt)": ["Amoxicillin sodium", "Thiazolidine ring", "Amino group"],
+  "Diclofenac": ["Diclofenac sodium", "Phenylacetic acid", "Chlorophenyl group"],
+  "Ibutilide": ["Ibutilide fumarate", "Methanesulfonamide", "Phenyl group"],
+  "Moxifloxacin": ["Moxifloxacin hydrochloride", "Fluoroquinolone", "Carboxyl group"],
+  "Propofol": ["2,6-diisopropylphenol", "Phenol group", "Isopropyl group"],
+  "Carbamazepin": ["Carbamazepine", "Dibenzazepine", "Urea group"],
+  "Pregabalin": ["3-isobutyl GABA", "Isobutyl group", "Gamma-aminobutyric acid"],
+  "Doxycycline": ["Doxycycline hyclate", "Tetracycline core", "Hydroxyl groups"],
+  "Ac-warfarin": ["Warfarin sodium", "Coumarin", "Hydroxybenzyl group"],
+  "Hydrochlorothiazide": ["Hydrochlorothiazide", "Thiazide ring", "Sulfonamide"],
+  "Levothyroxine / liothyronine": ["Levothyroxine", "Liothyronine", "Iodinated tyrosine"],
+  "Metoprolol": ["Metoprolol tartrate", "Beta-hydroxypropylamine", "Aromatic ether"],
+  "Omeprazole": ["Omeprazole magnesium", "Benzimidazole", "Sulfoxide group"],
+  "Ciprofloxacin": ["Ciprofloxacin hydrochloride", "Fluoroquinolone core", "Piperazine ring"],
+  "Sertraline": ["Sertraline hydrochloride", "Naphthalene", "Amine group"],
+  "Alprazolam": ["Alprazolam base", "Triazolobenzodiazepine", "Methyl group"],
+  "Levalbuterol": ["Levalbuterol hydrochloride", "Catechol", "Isopropylamino group"],
+  "Insulin glargine": ["Glycine", "Asparagine", "Insulin A and B chains"],
+  "Risperidone": ["Risperidone base", "Benzisoxazole", "Piperidine"],
+  "Haloperidol": ["Haloperidol base", "Butyrophenone", "Chlorophenyl group"],
+  "Lamotrigine": ["Lamotrigine base", "Dichlorophenyl ring", "Triazine"],
+  "Azithromycin": ["Azithromycin dihydrate", "Macrolide", "Desosamine sugar"],
+  "Linezolid": ["Linezolid base", "Oxazolidinone ring", "Fluorophenyl group"],
+  "Beclometasone": ["Beclometasone dipropionate", "Corticosteroid", "Propionate group"],
+  "Finasteride": ["Finasteride base", "Azasteroid", "Lactam group"],
+  "Tamsulosin": ["Tamsulosin hydrochloride", "Sulfonamide", "Methoxyphenethylamine"],
+  "Isotretinoin": ["13-cis-retinoic acid", "Vitamin A derivative", "Carboxylic acid"],
+  "Levodopa": ["Levodopa", "Carbidopa", "Phenylalanine derivative"]
+};
+
+
+        const medicineName = localStorage.getItem("selectedMedicine").trim();
+        console.log("Selected Medicine:", medicineName);
+
+        const normalizedKey = Object.keys(medicineIngredients).find(key => key.toLowerCase() === medicineName.toLowerCase());
+        const ingredients = normalizedKey ? medicineIngredients[normalizedKey] : [];
+
+        if (ingredients.length === 0) {
+            alert("No ingredient data available for: " + medicineName);
+        }
+
+
+        const nodes = [{ 
+            id: 0, 
+            label: medicineName, 
+            color: "#16a085",               // matches your theme's green
+            font: { color: "#444", size: 18, face: 'Poppins' }  // uses your white font and theme font
+        }];
+
+        const edges = [];
+
+        ingredients.forEach((ingredient, index) => {
+            nodes.push({ id: index + 1, label: ingredient });
+            edges.push({ from: 0, to: index + 1 });
+        });
+
+        const container = document.getElementById("network");
+        const data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
+        const options = {
+            nodes: {
+                shape: 'dot',
+                size: 16,
+                font: { size: 14 }
+            },
+            edges: {
+                arrows: 'to'
+            },
+            physics: {
+                stabilization: false
+            }
+        };
+        new vis.Network(container, data, options);
+    </script>
+</body>
+</html>

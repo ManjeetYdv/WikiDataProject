@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="mainTabs">
+        <div class="tabs" role="tablist">
+            <button class="tab-button active" role="tab" aria-selected="true" aria-controls="disease-tab" id="disease-button" onclick="switchTab('disease')">
+                Disease
+            </button>
+            <button class="tab-button" role="tab" aria-selected="false" aria-controls="medicine-tab" id="medicine-button" onclick="switchTab('medicine')">
+                Medicine
+            </button>
+        </div>
+    </div>
+    
+    <div id="mainContent">
+        <div id="disease-tab" class="tab-content active" role="tabpanel" aria-labelledby="disease-button">
+            <label for="disease-input" class="tab_label">Enter Disease:</label>
+                <input type="text" id="disease-input" placeholder="e.g., Diabetes">
+                <button class="search-btn" onclick="fetchMedicines()">Find Medicines</button>
+                <ul id="medicine-results"></ul>
+        </div>
+        <div id="medicine-tab" class="tab-content" role="tabpanel" aria-labelledby="medicine-button">
+            <label for="medicine-input" class="tab_label">Enter Medicine:</label>
+                <input type="text" id="medicine-input" placeholder="e.g., Ibuprofen">
+                <button class="search-btn" onclick="fetchDiseases()">Find Diseases</button>
+                <ul id="disease-results"></ul>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+</html>
