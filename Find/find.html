@@ -1,38 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <title>Disease ↔ Medicine Explorer</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <!-- Vis.js network library -->
+  <script src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
+  <link href="https://unpkg.com/vis-network@9.1.2/styles/vis-network.min.css" rel="stylesheet" />
+  <!-- Chart.js if needed -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* === Global Reset === */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; line-height: 1.4; padding: 1em; }
+
+    /* === Tab Buttons === */
+    .mainTabs {
+      display: flex;
+      justify-content: center;        /* center horizontally */
+      margin-bottom: 1.5em;           /* more breathing room */
+    }
+    .tabs {
+      display: inline-flex;
+      border-radius: 9999px;
+      background: #ecf0f1;
+    }
+    .tab-button {
+      font-size: 1.2rem;             /* larger text */
+      padding: 0.8em 1.6em;          /* bigger clickable area */
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s, transform 0.1s;
+      margin: 0 0.2em;
+      border-radius: 9999px;
+    }
+    .tab-button.active {
+      background: #1abc9c;
+      color: white;
+    }
+    .tab-button:hover:not(.active) {
+      background: #d1eae4;
+    }
+
+    /* === Control Row === */
+    .tab_label { margin-right: 0.5em; font-weight: 600; }
+    .control-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1em;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 0.6em 1em;
+      font-size: 1rem;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #1abc9c;
+      box-shadow: 0 0 0 3px rgba(26,188,156,0.2);
+    }
+
+    /* === Buttons === */
+    .search-btn {
+      margin-left: 0.5em;
+      padding: 0.6em 1.2em;
+      background: #1abc9c;
+      color: white;
+      font-size: 1rem;
+      font-weight: 500;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.1s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .search-btn:hover {
+      background: #16a085;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .search-btn:active {
+      background: #149174;
+      transform: translateY(0);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* === Layout === */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    #network { flex: 2; border-right: 1px solid #ccc; }
+    .flex-container {
+      display: flex;
+      height: 500px;
+      margin-top: 1em;
+    }
+    #medicine-list, #disease-results {
+      list-style: none;
+      padding-left: 0;
+    }
+    #medicine-list li, #disease-results li {
+      background: #f1f1f1;
+      margin-bottom: 8px;
+      padding: 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #medicine-list li:hover, #disease-results li:hover {
+      background: #dfe6e9;
+    }
+  </style>
 </head>
 <body>
-    <div class="mainTabs">
-        <div class="tabs" role="tablist">
-            <button class="tab-button active" role="tab" aria-selected="true" aria-controls="disease-tab" id="disease-button" onclick="switchTab('disease')">
-                Disease
-            </button>
-            <button class="tab-button" role="tab" aria-selected="false" aria-controls="medicine-tab" id="medicine-button" onclick="switchTab('medicine')">
-                Medicine
-            </button>
-        </div>
+
+  <!-- === Tabs === -->
+  <div class="mainTabs">
+    <div class="tabs" role="tablist">
+      <button id="disease-button" class="tab-button active"
+              role="tab" aria-selected="true"
+              onclick="switchTab('disease')">
+        Disease
+      </button>
+      <button id="medicine-button" class="tab-button"
+              role="tab" aria-selected="false"
+              onclick="switchTab('medicine')">
+        Medicine
+      </button>
     </div>
-    
-    <div id="mainContent">
-        <div id="disease-tab" class="tab-content active" role="tabpanel" aria-labelledby="disease-button">
-            <label for="disease-input" class="tab_label">Enter Disease:</label>
-                <input type="text" id="disease-input" placeholder="e.g., Diabetes">
-                <button class="search-btn" onclick="fetchMedicines()">Find Medicines</button>
-                <ul id="medicine-results"></ul>
+  </div>
+
+  <div id="mainContent">
+    <!-- === Disease Tab === -->
+    <div id="disease-tab" class="tab-content active" role="tabpanel">
+      <div class="control-row">
+        <label for="disease-input" class="tab_label">Enter Disease:</label>
+        <input type="text" id="disease-input" placeholder="e.g., Diabetes">
+        <button class="search-btn" onclick="fetchMedicines()">Visualize</button>
+      </div>
+      <div class="flex-container">
+        <div id="network"></div>
+        <div style="flex:1; padding:10px; overflow-y:auto;">
+          <h3>Medicines:</h3>
+          <ul id="medicine-list"></ul>
         </div>
-        <div id="medicine-tab" class="tab-content" role="tabpanel" aria-labelledby="medicine-button">
-            <label for="medicine-input" class="tab_label">Enter Medicine:</label>
-                <input type="text" id="medicine-input" placeholder="e.g., Ibuprofen">
-                <button class="search-btn" onclick="fetchDiseases()">Find Diseases</button>
-                <ul id="disease-results"></ul>
-        </div>
+      </div>
     </div>
-    <script src="script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- === Medicine Tab === -->
+    <div id="medicine-tab" class="tab-content" role="tabpanel">
+      <div class="control-row">
+        <label for="medicine-input" class="tab_label">Enter Medicine:</label>
+        <input type="text" id="medicine-input" placeholder="e.g., Ibuprofen">
+        <button class="search-btn" onclick="fetchDiseases()">Find Diseases</button>
+      </div>
+      <ul id="disease-results"></ul>
+    </div>
+  </div>
+
+  <!-- External JavaScript -->
+  <script src="script.js"></script>
+
 </body>
 </html>
