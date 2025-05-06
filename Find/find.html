@@ -115,6 +115,49 @@
     #medicine-list li:hover, #disease-results li:hover {
       background: #dfe6e9;
     }
+    /* === Layout === */
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+}
+
+/* Shared network container styling */
+#network, #network-medicine {
+  flex: 2;
+  border-right: 1px solid #ccc;
+}
+
+/* Flex layout for side-by-side content */
+.flex-container {
+  display: flex;
+  height: 600px;
+  margin-top: 1em;
+}
+
+/* List styles for both tabs */
+#medicine-list, #disease-results {
+  list-style: none;
+  padding-left: 0;
+}
+
+/* List item styles */
+#medicine-list li, #disease-results li {
+  background: #f1f1f1;
+  margin-bottom: 8px;
+  padding: 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+/* Hover effect for list items */
+#medicine-list li:hover, #disease-results li:hover {
+  background: #dfe6e9;
+}
+
+
   </style>
 </head>
 <body>
@@ -153,14 +196,22 @@
     </div>
 
     <!-- === Medicine Tab === -->
-    <div id="medicine-tab" class="tab-content" role="tabpanel">
-      <div class="control-row">
-        <label for="medicine-input" class="tab_label">Enter Medicine:</label>
-        <input type="text" id="medicine-input" placeholder="e.g., Ibuprofen">
-        <button class="search-btn" onclick="fetchDiseases()">Find Diseases</button>
-      </div>
-      <ul id="disease-results"></ul>
+    <!-- === Medicine Tab === -->
+<div id="medicine-tab" class="tab-content" role="tabpanel">
+    <div class="control-row">
+      <label for="medicine-input" class="tab_label">Enter Medicine:</label>
+      <input type="text" id="medicine-input" placeholder="e.g., Ibuprofen">
+      <button class="search-btn" onclick="fetchDiseases()">Find Diseases</button>
     </div>
+    <div class="flex-container">
+      <div id="network-medicine"></div> <!-- Network visualization -->
+      <div style="flex:1; padding:10px; overflow-y:auto;">
+        <h3>Diseases:</h3>
+        <ul id="disease-results"></ul>
+      </div>
+    </div>
+  </div>
+  
   </div>
 
   <!-- External JavaScript -->
